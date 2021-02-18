@@ -17,6 +17,16 @@ class Ball:
         self.held = held
         grid[self.r][self.c] = Ball.symbol
 
+    def get_position(self):
+        return self.r, self.c
+
+    def get_velocity(self):
+        return self.v_r, self.v_c
+
+    def set_position(self, r, c):
+        self.r = r
+        self.c = c
+
     def collision_with_vertical_wall(self):
         self.v_r = -self.v_r
 

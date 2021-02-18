@@ -39,6 +39,9 @@ class Paddle:
         self.c = c
         self.step_size = 1
 
+    def get_position(self):
+        return self.r, self.c
+
     def _move_left(self, grid):
         old_end = self.c+self.length - 1
         self.c -= self.step_size

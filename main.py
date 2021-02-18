@@ -9,10 +9,11 @@ from powerup import ExpandPaddle
 def handle_balls():
     global Balls, started, lives, game_over, grid, paddle
     for ball in Balls:
+        position = ball.get_position()
         if not ball.held:
             started = True
             ball.update_position(grid)
-        if ball.r == len(grid)-1:
+        if position[0] == len(grid)-1:
             grid[ball.r][ball.c] = "-"
             Balls.remove(ball)
             del ball
@@ -33,7 +34,7 @@ def handle_bricks():
             score += brick.update_score()
             del brick
         else:
-            brick.display_on_grid(grid, Balls, Bricks)
+            brick.display_on_grid(grid, Balls)
 
 
 def handle_power_ups():
@@ -57,7 +58,7 @@ def handle_power_ups():
 
 
 terminal_size = get_terminal_size(0)
-resolution = (terminal_size.lines-3, terminal_size.columns//2)
+resolution = (terminal_size.lines-3, terminal_size.columns-2)
 grid = []
 board = Board(resolution[0], resolution[1], grid)
 board.create_grid()

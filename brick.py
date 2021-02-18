@@ -1,6 +1,6 @@
 from ball import Ball
 import colorama
-
+from time import sleep
 
 class Brick:
 
@@ -24,19 +24,30 @@ class Brick:
         return self.score
 
     def on_hit(self):
-        self.health -= 1
+        if self.health > 0:
+            self.health -= 1
 
-    def display_on_grid(self, grid, balls, bricks):
+    def display_on_grid(self, grid, balls):
         for r in range(-1, 2):
             for c in range(Brick.brick_length):
                 if (r == -1 or r == 1) and grid[self.r+r][self.c+c] == Ball.symbol:
                     for ball in balls:
-                        if ball.r == self.r+r and ball.c == self.c+c:
-                            ball.collision_with_brick_vertical()
+                        position = ball.get_position()
+                        velocity = ball.get_velocity()
+                        if position[0] == self.r+r and position[1] == self.c+c:
+                            if (r == -1 and velocity[0] < 0) or (r == 1 and velocity[0] > 0):
+                                if velocity[1] > 0:
+                                    ball.set_position(self.r, self.c)
+                                else:
+                                    ball.set_position(self.r, self.c+Brick.brick_length-1)
+                                ball.collision_with_brick_horizontal()
+                            else:
+                                ball.collision_with_brick_vertical()
                     self.on_hit()
                 elif r == 0 and (c == 0 or c == Brick.brick_length-1) and grid[self.r][self.c+c] == Ball.symbol:
                     for ball in balls:
-                        if ball.r == self.r+r and ball.c == self.c+c:
+                        position = ball.get_position()
+                        if position[0] == self.r+r and position[1] == self.c+c:
                             ball.collision_with_brick_horizontal()
                     self.on_hit()
                 else:

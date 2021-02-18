@@ -28,7 +28,8 @@ class PowerUp:
     def update_position(self, grid, paddle, balls, catchable_power_ups, active_power_ups):
         grid[self.r][self.c] = " "
         self.r += 1
-        if self.r == paddle.r and paddle.c <= self.c < paddle.c + paddle.length:
+        position = paddle.get_position()
+        if self.r == position[0] and position[1] <= self.c < position[1] + paddle.length:
             catchable_power_ups.remove(self)
             if "=" in self.symbol:
                 self.activate(paddle, grid)

@@ -24,7 +24,6 @@ class Board:
 
     def print_grid(self):
         for i in range(self.rows):
-            print("\t\t", end="")
             for j in range(self.columns):
                 print(self.grid[i][j], end="")
             print()
@@ -36,4 +35,4 @@ class Board:
             os.system("clear")
         else:
             os.system("cls")
-        print("\t\tLives: %1d\tTime: %.1f seconds\tScore: %4d" % (lives, time, score))
+        print("Lives: %1d\tTime: %.1f seconds\tScore: %4d" % (lives, time, score))
