@@ -1,5 +1,5 @@
 from board import Board
-from ball import Ball
+from ball import Ball, ThroughBall
 from paddle import Paddle, GrabPaddle
 from brick import Brick, NonBreakableBrick
 from os import get_terminal_size
@@ -23,7 +23,7 @@ def handle_balls():
     if len(Balls) == 0:
         lives -= 1
         if lives > 0:
-            Balls.append(Ball(paddle.r, paddle.c, 0, 0, paddle.length, grid, True))
+            Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
         else:
             game_over = True
 
@@ -67,7 +67,33 @@ def handle_ball_multiplier():
     global Balls
     new_balls = []
     for ball in Balls:
-        new_balls.append(Ball(ball.r, ball.c, ball.v_r, ball.v_c+1, 0, grid, False))
+        if hasattr(ball, "through"):
+            new_balls.append(ThroughBall(ball.r, ball.c, -1, -ball.v_c+1, grid))
+        else:
+            new_balls.append(Ball(ball.r, ball.c, -1, -ball.v_c+1, grid))
+    for new_ball in new_balls:
+        Balls.append(new_ball)
+
+
+def activate_through_ball():
+    global Balls, paddle
+    new_balls = []
+    for ball in Balls:
+        new_balls.append(
+            ThroughBall(ball.r, ball.c, ball.v_r, ball.v_c, grid,
+                        held=ball.held, temp_v_r=ball.temp_v_r, temp_v_c=ball.temp_v_c))
+        del ball
+    for new_ball in new_balls:
+        Balls.append(new_ball)
+
+
+def deactivate_through_ball():
+    global Balls, paddle
+    new_balls = []
+    for ball in Balls:
+        new_balls.append(Ball(ball.r, ball.c, ball.v_r, ball.v_c, grid,
+                              held=ball.held, temp_v_c=ball.temp_v_c, temp_v_r=ball.temp_v_r))
+        del ball
     for new_ball in new_balls:
         Balls.append(new_ball)
 
@@ -93,7 +119,8 @@ def handle_power_ups():
                     power_up.activate(paddle, grid)
             else:
                 if colorama.Fore.GREEN in power_up.symbol:
-                    pass
+                    activate_through_ball()
+                    power_up.set_active(True)
                 elif colorama.Fore.YELLOW in power_up.symbol:
                     handle_ball_multiplier()
                     power_up.set_active(True)
@@ -103,16 +130,14 @@ def handle_power_ups():
             if "=" in power_up.symbol:
                 if colorama.Fore.GREEN in power_up.symbol:
                     paddle = Paddle(paddle.length, paddle.r, paddle.c)
-                    power_up.set_active(False)
                 else:
                     power_up.deactivate(paddle, grid)
             else:
                 if colorama.Fore.GREEN in power_up.symbol:
-                    pass
+                    deactivate_through_ball()
                 elif colorama.Fore.YELLOW in power_up.symbol:
                     if len(Balls) > 1:
                         Balls.pop()
-                    power_up.set_active(False)
                 else:
                     power_up.deactivate(Balls)
             active_power_ups.remove(power_up)
@@ -129,7 +154,7 @@ board.create_grid()
 Balls = []
 Bricks = [Brick(2, 2, 15, 30), Brick(1, 10, 10, 10)]
 paddle = Paddle(7, resolution[0]-2, resolution[1]//2)
-Balls.append(Ball(paddle.r, paddle.c, 0, 0, paddle.length, grid, True))
+Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length,True))
 lives = 3
 score = 0
 time = 0

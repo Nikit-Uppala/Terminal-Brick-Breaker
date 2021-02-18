@@ -6,14 +6,14 @@ class Ball:
 
     symbol = "O"
 
-    def __init__(self, r, c, v_r, v_c, paddle_length, grid, held):
+    def __init__(self, r, c, v_r, v_c, grid, paddle_length=0, held=False, temp_v_r=-1, temp_v_c=0):
         self.r = r
         self.c = c if paddle_length == 0 else random.randint(c+1, c+paddle_length-2)
         self.v_r = v_r
         self.v_c = v_c
-        self.temp_v_r = -1 if paddle_length != 0 else 0
+        self.temp_v_r = temp_v_r
         self.position_held = -1 if paddle_length == 0 else self.c - c
-        self.temp_v_c = -(paddle_length // 2) + self.position_held if paddle_length != 0 else 0
+        self.temp_v_c = -(paddle_length // 2) + self.position_held if temp_v_c == 0 else temp_v_c
         self.held = held
         grid[self.r][self.c] = Ball.symbol
 
@@ -108,3 +108,15 @@ class Ball:
         if self.r <= 0:
             grid[self.r][self.c] = "-"
         self.set_position(new_r, new_c, grid)
+
+
+class ThroughBall(Ball):
+    def __init__(self, r, c, v_r, v_c, grid, paddle_length=0, held=False, temp_v_r=0, temp_v_c=0):
+        super().__init__(r, c, v_r, v_c, grid, paddle_length, held, temp_v_r, temp_v_c)
+        self.through = True
+
+    def collision_with_brick_horizontal(self):
+        pass
+
+    def collision_with_brick_vertical(self):
+        pass
