@@ -83,7 +83,7 @@ time_gap = 0.1
 started = False
 
 while not game_over:
-    Board.display_game_details(lives, score, time, time_gap)
+    direction = Board.display_game_details(lives, score, time, time_gap)
     board.print_grid()
     if len(Bricks) == 0:
         game_over = True
@@ -91,7 +91,7 @@ while not game_over:
         time += time_gap
     handle_power_ups()
     handle_balls()
-    paddle.move_paddle(grid, Balls, catchable_power_ups, active_power_ups, time_gap)
+    paddle.move_paddle(grid, Balls, direction)
     handle_bricks()
 if len(Bricks) == 0:
     print("\t\t\t\t\tYou Won")

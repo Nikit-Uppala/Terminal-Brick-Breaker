@@ -35,7 +35,7 @@ class PowerUp:
 
 
 class ExpandPaddle(PowerUp):
-    def __init__(self, r, c, catchable_list, grid):
+    def __init__(self, r, c, catchable_list):
         super().__init__(r, c, catchable_list, PowerUp.power_up_symbols[0])
 
     def activate(self, paddle, grid):
@@ -48,7 +48,7 @@ class ExpandPaddle(PowerUp):
 
 
 class ShrinkPaddle(PowerUp):
-    def __init__(self, r, c, catchable_list, grid):
+    def __init__(self, r, c, catchable_list):
         super().__init__(r, c, catchable_list, PowerUp.power_up_symbols[1])
 
     def activate(self, paddle, grid):
@@ -61,7 +61,7 @@ class ShrinkPaddle(PowerUp):
 
 
 # class BallMultiplier(PowerUp):
-#     def __init__(self, r, c, catchable_list, grid):
+#     def __init__(self, r, c, catchable_list):
 #         super().__init__(r, c, catchable_list, PowerUp.power_up_symbols[2])
 #
 #
@@ -80,7 +80,7 @@ class ShrinkPaddle(PowerUp):
 
 
 class FastBall(PowerUp):
-    def __init__(self, r, c, catchable_list, grid):
+    def __init__(self, r, c, catchable_list):
         super().__init__(r, c, catchable_list, PowerUp.power_up_symbols[3])
 
     def activate(self, balls, grid):
@@ -92,3 +92,13 @@ class FastBall(PowerUp):
         self.active = True
         for ball in balls:
             ball.multiply_speed(1/2)
+
+
+class ThroughBallPowerUp(PowerUp):
+    def __init__(self, r, c, catchable_list):
+        super().__init__(r, c, catchable_list, PowerUp.power_up_symbols[4])
+
+
+class GrabPaddlePowerUp(PowerUp):
+    def __init__(self, r, c, catchable_list):
+        super().__init__(r, c, catchable_list, PowerUp.power_up_symbols[5])

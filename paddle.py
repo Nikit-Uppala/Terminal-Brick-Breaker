@@ -1,4 +1,3 @@
-from input import input_to, Get
 from ball import Ball
 import colorama
 
@@ -70,11 +69,9 @@ class Paddle:
             for i in range(self.step_size):
                 grid[self.r][old_start+i] = " "
 
-    def move_paddle(self, grid, balls, catch_power_ups, active_power_ups, timeout):
+    def move_paddle(self, grid, balls, direction):
         if self.c+self.length-1 > len(grid[0])-2:
             self.c = len(grid[0])-1-self.length
-        get_key = Get()
-        direction = input_to(get_key, timeout)
         if direction is not None:
             if direction == "a":
                 self._move_left(grid, balls)
