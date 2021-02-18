@@ -8,12 +8,12 @@ class Ball:
 
     def __init__(self, r, c, v_r, v_c, paddle_length, grid, held):
         self.r = r
-        self.c = random.randint(c+1, c+paddle_length-2)
+        self.c = c if paddle_length == 0 else random.randint(c+1, c+paddle_length-2)
         self.v_r = v_r
         self.v_c = v_c
-        self.temp_v_r = -1
-        self.position_held = self.c - c
-        self.temp_v_c = -(paddle_length // 2) + self.position_held
+        self.temp_v_r = -1 if paddle_length != 0 else 0
+        self.position_held = -1 if paddle_length == 0 else self.c - c
+        self.temp_v_c = -(paddle_length // 2) + self.position_held if paddle_length != 0 else 0
         self.held = held
         grid[self.r][self.c] = Ball.symbol
 

@@ -32,7 +32,7 @@ class Brick:
 
     def display_on_grid(self, grid, balls):
         n_rows = len(Brick.brick_structure)
-        start, end = -n_rows // 2, n_rows // 2
+        start, end = -(n_rows // 2), n_rows // 2
         for r in range(start, end + 1):
             for c in range(Brick.brick_length):
                 if (r == start or r == end) and grid[self.r+r][self.c+c] == Ball.symbol:
