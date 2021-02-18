@@ -3,20 +3,20 @@ from ball import Ball
 from paddle import Paddle, GrabPaddle
 from brick import Brick, NonBreakableBrick
 from os import get_terminal_size
-from powerup import ExpandPaddle
+from powerup import ExpandPaddle, ShrinkPaddle, FastBall
 
 
 def handle_balls():
     global Balls, started, lives, game_over, grid, paddle
     for ball in Balls:
         position = ball.get_position()
-        if not ball.held:
-            started = True
-            ball.update_position(grid)
         if position[0] == len(grid)-1:
-            grid[ball.r][ball.c] = "-"
+            grid[position[0]][position[1]] = "-"
             Balls.remove(ball)
             del ball
+        elif not ball.held:
+            started = True
+            ball.update_position(grid)
     if len(Balls) == 0:
         lives -= 1
         if lives > 0:
@@ -47,7 +47,13 @@ def handle_power_ups():
         else:
             power_up.update_position(grid, paddle, Balls, catchable_power_ups, active_power_ups)
     for power_up in active_power_ups:
-        power_up.decrease_timer(time_gap)
+        if power_up.active:
+            power_up.decrease_timer(time_gap)
+        else:
+            if "=" in power_up.symbol:
+                power_up.activate(paddle, grid)
+            else:
+                power_up.activate(Balls, grid)
         if power_up.time_left <= 0:
             if "=" in power_up.symbol:
                 power_up.deactivate(paddle, grid)
@@ -64,7 +70,7 @@ board = Board(resolution[0], resolution[1], grid)
 board.create_grid()
 Balls = []
 Bricks = [Brick(2, 2, 15, 30)]
-default_paddle = Paddle(7, resolution[0]-2, resolution[1]//2)
+default_paddle = Paddle(7, resolution[0]-2, resolution[1]-8)
 paddle = default_paddle
 Balls.append(Ball(paddle.r, paddle.c, 0, 0, paddle.length, grid, True))
 lives = 3
@@ -72,9 +78,8 @@ score = 0
 time = 0
 catchable_power_ups = []
 active_power_ups = []
-# catchable_power_ups.append()
 game_over = False
-time_gap = 0.06
+time_gap = 0.1
 started = False
 
 while not game_over:
@@ -83,7 +88,7 @@ while not game_over:
     if len(Bricks) == 0:
         game_over = True
     if started:
-        time += time_gap * 2
+        time += time_gap
     handle_power_ups()
     handle_balls()
     paddle.move_paddle(grid, Balls, catchable_power_ups, active_power_ups, time_gap)

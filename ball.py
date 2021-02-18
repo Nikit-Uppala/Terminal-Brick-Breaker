@@ -8,7 +8,7 @@ class Ball:
 
     def __init__(self, r, c, v_r, v_c, paddle_length, grid, held):
         self.r = r
-        self.c = c if paddle_length == 0 else random.randint(c+1, c+paddle_length-2)
+        self.c = random.randint(c+1, c+paddle_length-2)
         self.v_r = v_r
         self.v_c = v_c
         self.temp_v_r = -1
@@ -23,9 +23,10 @@ class Ball:
     def get_velocity(self):
         return self.v_r, self.v_c
 
-    def set_position(self, r, c):
+    def set_position(self, r, c, grid):
         self.r = r
         self.c = c
+        grid[self.r][self.c] = Ball.symbol
 
     def collision_with_vertical_wall(self):
         self.v_r = -self.v_r
@@ -101,11 +102,9 @@ class Ball:
         if new_c <= 0 or new_c >= len(grid[0]) - 1:
             self.collision_with_horizontal_wall()
             new_c = 0 if new_c <= 0 else len(grid[0]) - 1
-        grid[new_r][new_c] = Ball.symbol
         grid[self.r][self.c] = " "
         if self.c <= 0 or self.c >= len(grid[0])-1:
             grid[self.r][self.c] = "|"
         if self.r <= 0:
             grid[self.r][self.c] = "-"
-        self.r = new_r
-        self.c = new_c
+        self.set_position(new_r, new_c, grid)
