@@ -17,6 +17,12 @@ class Ball:
         self.held = held
         grid[self.r][self.c] = Ball.symbol
 
+    def multiply_speed(self, factor):
+        new_v_r = int(self.v_r * factor)
+        self.v_r = new_v_r
+        if new_v_r == 0:
+            self.v_r = -1 if self.v_r < 0 else 1
+
     def get_position(self):
         return self.r, self.c
 

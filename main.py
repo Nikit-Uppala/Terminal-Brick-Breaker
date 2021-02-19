@@ -144,7 +144,7 @@ def handle_power_ups():
             del power_up
 
 
-power_up_probability = 0.4
+power_up_probability = 0.6
 num_power_ups = 6
 terminal_size = get_terminal_size(0)
 resolution = (terminal_size.lines-3, terminal_size.columns-2)
