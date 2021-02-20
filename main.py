@@ -44,7 +44,7 @@ def deactivate_power_up(power_up):
 
 
 def handle_balls():
-    global Balls, started, lives, game_over, grid, paddle
+    global Balls, started, lives, game_over, grid, paddle, life_lost
     for ball in Balls:
         position = ball.get_position()
         if position[0] == len(grid)-1:
@@ -57,6 +57,7 @@ def handle_balls():
     if len(Balls) == 0:
         lives -= 1
         if lives > 0:
+            life_lost = True
             Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
             for power_up in active_power_ups:
                 deactivate_power_up(power_up)
@@ -119,6 +120,7 @@ def deactivate_ball_multiplier():
     if num > 1:
         to_be_removed = -(-num//2)
         for i in range(to_be_removed):
+            grid[Balls[-1].r][Balls[-1].c] = " "
             Balls.pop()
 
 
@@ -185,6 +187,7 @@ active_power_ups = []
 game_over = False
 time_gap = 0.1
 started = False
+life_lost = False
 
 while not game_over:
     direction = Board.display_game_details(lives, score, time, time_gap)
@@ -195,6 +198,9 @@ while not game_over:
         time += time_gap
     handle_power_ups()
     handle_balls()
+    if life_lost:
+        life_lost = False
+        continue
     paddle.move_paddle(grid, Balls, direction)
     handle_bricks()
 if len(Bricks) == 0:
