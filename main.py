@@ -1,11 +1,12 @@
 from board import Board
 from ball import Ball, ThroughBall
 from paddle import Paddle, GrabPaddle
-from brick import Brick, NonBreakableBrick
+from brick import Brick
 from os import get_terminal_size
 import random as rnd
 from powerup import ExpandPaddle, ShrinkPaddle, FastBall, PowerUp
 import colorama
+from brick_pattern import generate_bricks
 
 
 def activate_power_up(power_up):
@@ -173,7 +174,7 @@ grid = []
 board = Board(resolution[0], resolution[1], grid)
 board.create_grid()
 Balls = []
-Bricks = [Brick(2, 2, 15, 30), Brick(1, 10, 10, 10)]
+Bricks = generate_bricks(resolution)
 paddle = Paddle(7, resolution[0]-2, resolution[1]//2)
 Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length,True))
 lives = 3
