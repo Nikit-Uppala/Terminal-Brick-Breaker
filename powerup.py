@@ -15,7 +15,7 @@ class PowerUp:
     def __init__(self, r, c, symbol):
         self.r = r
         self.c = c
-        self.time_left = 12
+        self.time_left = 6
         self.symbol = symbol
         self.active = False
 

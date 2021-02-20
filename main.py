@@ -6,7 +6,40 @@ from os import get_terminal_size
 import random as rnd
 from powerup import ExpandPaddle, ShrinkPaddle, FastBall, PowerUp
 import colorama
-from time import sleep
+
+
+def activate_power_up(power_up):
+    global paddle, grid, Balls
+    power_up.set_active(True)
+    if "=" in power_up.symbol:
+        if colorama.Fore.GREEN in power_up.symbol:
+            paddle = GrabPaddle(paddle.length, paddle.r, paddle.c)
+        else:
+            power_up.activate(paddle, grid)
+    else:
+        if colorama.Fore.GREEN in power_up.symbol:
+            activate_through_ball()
+        elif colorama.Fore.YELLOW in power_up.symbol:
+            activate_ball_multiplier()
+        else:
+            power_up.activate(Balls, grid)
+
+
+def deactivate_power_up(power_up):
+    global paddle, grid, Balls
+    power_up.set_active(False)
+    if "=" in power_up.symbol:
+        if colorama.Fore.GREEN in power_up.symbol:
+            paddle = Paddle(paddle.length, paddle.r, paddle.c)
+        else:
+            power_up.deactivate(paddle, grid)
+    else:
+        if colorama.Fore.GREEN in power_up.symbol:
+            deactivate_through_ball()
+        elif colorama.Fore.YELLOW in power_up.symbol:
+            deactivate_ball_multiplier()
+        else:
+            power_up.activate(Balls, grid)
 
 
 def handle_balls():
@@ -24,6 +57,10 @@ def handle_balls():
         lives -= 1
         if lives > 0:
             Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
+            for power_up in active_power_ups:
+                deactivate_power_up(power_up)
+                active_power_ups.remove(power_up)
+                del power_up
         else:
             game_over = True
 
@@ -63,7 +100,7 @@ def handle_bricks():
             brick.display_on_grid(grid, Balls)
 
 
-def handle_ball_multiplier():
+def activate_ball_multiplier():
     global Balls
     new_balls = []
     for ball in Balls:
@@ -75,13 +112,23 @@ def handle_ball_multiplier():
         Balls.append(new_ball)
 
 
+def deactivate_ball_multiplier():
+    global Balls
+    num = len(Balls)
+    if num > 1:
+        to_be_removed = -(-num//2)
+        for i in range(to_be_removed):
+            Balls.pop()
+
+
 def activate_through_ball():
-    global Balls, paddle
+    global Balls
     new_balls = []
     for ball in Balls:
         new_balls.append(
             ThroughBall(ball.r, ball.c, ball.v_r, ball.v_c, grid,
                         held=ball.held, temp_v_r=ball.temp_v_r, temp_v_c=ball.temp_v_c))
+        Balls.remove(ball)
         del ball
     for new_ball in new_balls:
         Balls.append(new_ball)
@@ -111,35 +158,9 @@ def handle_power_ups():
         if power_up.active:
             power_up.decrease_timer(time_gap)
         else:
-            if "=" in power_up.symbol:
-                if colorama.Fore.GREEN in power_up.symbol:
-                    paddle = GrabPaddle(paddle.length, paddle.r, paddle.c)
-                    power_up.set_active(True)
-                else:
-                    power_up.activate(paddle, grid)
-            else:
-                if colorama.Fore.GREEN in power_up.symbol:
-                    activate_through_ball()
-                    power_up.set_active(True)
-                elif colorama.Fore.YELLOW in power_up.symbol:
-                    handle_ball_multiplier()
-                    power_up.set_active(True)
-                else:
-                    power_up.activate(Balls, grid)
+            activate_power_up(power_up)
         if power_up.time_left <= 0:
-            if "=" in power_up.symbol:
-                if colorama.Fore.GREEN in power_up.symbol:
-                    paddle = Paddle(paddle.length, paddle.r, paddle.c)
-                else:
-                    power_up.deactivate(paddle, grid)
-            else:
-                if colorama.Fore.GREEN in power_up.symbol:
-                    deactivate_through_ball()
-                elif colorama.Fore.YELLOW in power_up.symbol:
-                    if len(Balls) > 1:
-                        Balls.pop()
-                else:
-                    power_up.deactivate(Balls)
+            deactivate_power_up(power_up)
             active_power_ups.remove(power_up)
             del power_up
 
