@@ -68,7 +68,6 @@ class Brick:
                                     ball.set_position(self.r, self.c, grid)
                                 else:
                                     ball.set_position(self.r, self.c+Brick.brick_length-1, grid)
-                                ball.collision_with_brick_horizontal()
                                 grid[self.r+r][self.c+c] = self.brick_structure[r+1][c]
                             else:
                                 ball.collision_with_brick_vertical()
