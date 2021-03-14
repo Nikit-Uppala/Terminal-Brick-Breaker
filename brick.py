@@ -41,6 +41,9 @@ class Brick:
             for c in range(Brick.brick_length):
                 grid[self.r+r][self.c+c] = " "
 
+    def move_down(self):
+        self.r = self.r+1
+
     def update_score(self):
         return self.score
 

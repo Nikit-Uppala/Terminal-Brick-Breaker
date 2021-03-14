@@ -177,7 +177,8 @@ def check_game_over():
 
 
 def reset_objects():
-    global Balls, paddle, catchable_power_ups, active_power_ups, Bricks
+    global Balls, paddle, catchable_power_ups, active_power_ups, Bricks, started, time_limit, level_start_time
+    time_limit = time + 10*level
     for ball in Balls:
         if 0 < ball.c < resolution[1] or ball.r > 0:
             grid[ball.r][ball.c] = " "
@@ -192,6 +193,17 @@ def reset_objects():
     Bricks = generate_bricks(resolution, level)
     catchable_power_ups.clear()
     active_power_ups.clear()
+    level_start_time = time
+    started = False
+
+
+def move_bricks_down():
+    global Bricks, game_over
+    for brick in Bricks:
+        brick.remove_from_grid(grid)
+        brick.move_down()
+        if brick.r == paddle.r:
+            game_over = True
 
 
 power_up_probability = 0.46
@@ -211,8 +223,8 @@ catchable_power_ups = []
 active_power_ups = []
 game_over = False
 level = 1
-Bricks = []
 Bricks = generate_bricks(resolution, level)
+time_limit = 0.5
 time_gap = 0.1
 started = False
 life_lost = False
@@ -228,6 +240,7 @@ while not game_over:
             reset_objects()
     if started:
         time += time_gap
+
     handle_power_ups()
     handle_balls()
     if life_lost:
@@ -235,6 +248,8 @@ while not game_over:
         continue
     paddle.move_paddle(grid, Balls, direction)
     handle_bricks()
+    if time > time_limit and paddle.collision_ball:
+        move_bricks_down()
 if len(Bricks) == 0:
     print("You Won!!")
 else:

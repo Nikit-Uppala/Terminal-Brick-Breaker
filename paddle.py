@@ -10,12 +10,14 @@ class Paddle:
         for ball in balls:
             if ball.r == self.r and ball.c == self.c + i:
                 if not ball.held:
+                    self.collision_ball = True
                     ball.collision_with_paddle(i, self.length)
                 else:
                     grid[self.r][self.c + i] = Paddle.symbol
                     ball.move_with_paddle(grid, self.c)
 
     def display_in_grid(self, grid, balls):
+        self.collision_ball = False
         for i in range(self.length):
             if grid[self.r][self.c+i] == Ball.symbol:
                 self.collision_with_ball(balls, i, grid)
@@ -40,6 +42,7 @@ class Paddle:
         self.r = r
         self.c = c
         self.step_size = 2
+        self.collision_ball = False
 
     def get_position(self):
         return self.r, self.c
