@@ -2,11 +2,12 @@ from brick import Brick, NonBreakableBrick
 import random as rnd
 
 
-def generate_bricks(resolution):
+def generate_bricks(resolution, level):
+    return [Brick(level, 4, 10, 10)]
     bricks = []
     rows = resolution[0]
     cols = resolution[1]
-    start_row, end_row = 3, 9
+    start_row, end_row = 3, 3*level
     start_col, end_col = 4, cols-12
     for r in range(start_row, end_row+1, 3):
         for c in range(start_col, end_col, Brick.brick_length+2):

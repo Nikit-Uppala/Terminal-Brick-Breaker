@@ -23,6 +23,9 @@ class Ball:
         if new_v_r == 0:
             self.v_r = -1 if self.v_r < 0 else 1
 
+    def remove_from_gird(self, grid):
+        grid[self.r][self.c] = " "
+
     def get_position(self):
         return self.r, self.c
 
