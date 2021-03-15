@@ -32,6 +32,10 @@ class PowerUp:
         if grid[self.r][self.c] == " ":
             grid[self.r][self.c] = self.symbol
 
+    def remove_from_grid(self, grid):
+        if grid[self.r][self.c] == self.symbol:
+            grid[self.r][self.c] = " "
+
     def decrease_timer(self, sleep_time):
         self.time_left -= sleep_time
 

@@ -178,11 +178,11 @@ def check_game_over():
 
 def reset_objects():
     global Balls, paddle, catchable_power_ups, active_power_ups, Bricks, started, time_limit, level_start_time
-    time_limit = time + 10*level
     for ball in Balls:
         if 0 < ball.c < resolution[1] or ball.r > 0:
-            grid[ball.r][ball.c] = " "
-    Balls.clear()
+            ball.remove_from_gird(grid)
+            Balls.remove(ball)
+            del ball
     paddle.remove_from_grid(grid)
     paddle = Paddle(7, resolution[0] - 2, resolution[1] // 2)
     Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
@@ -191,10 +191,15 @@ def reset_objects():
         Bricks.remove(brick)
         del brick
     Bricks = generate_bricks(resolution, level)
-    catchable_power_ups.clear()
-    active_power_ups.clear()
-    level_start_time = time
+    for power_up in catchable_power_ups:
+        power_up.remove_from_grid(grid)
+        catchable_power_ups.remove(power_up)
+        del power_up
+    for power_up in active_power_ups:
+        active_power_ups.remove(power_up)
+        del power_up
     started = False
+    time_limit = time + 10 * level
 
 
 def move_bricks_down():
@@ -228,10 +233,18 @@ time_limit = 0.5
 time_gap = 0.1
 started = False
 life_lost = False
+level_up_cheat = 'lL'
 
 while not game_over:
-    direction = Board.display_game_details(lives, score, level, time, time_gap)
+    key = Board.display_game_details(lives, score, level, time, time_gap)
     board.print_grid()
+    if key is not None and key in level_up_cheat:
+        level += 1
+        if level > 3:
+            game_over = True
+        else:
+            reset_objects()
+        continue
     if check_game_over():
         level += 1
         if level > 3:
@@ -246,11 +259,8 @@ while not game_over:
     if life_lost:
         life_lost = False
         continue
-    paddle.move_paddle(grid, Balls, direction)
+    paddle.move_paddle(grid, Balls, key)
     handle_bricks()
     if time > time_limit and paddle.collision_ball:
         move_bricks_down()
-if len(Bricks) == 0:
-    print("You Won!!")
-else:
-    print("\t\t\t\t\tGame Over")
+print("\t\t\t\tGame Over")
