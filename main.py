@@ -205,7 +205,7 @@ def move_bricks_down():
     for brick in Bricks:
         brick.remove_from_grid(grid)
         brick.move_down()
-        if brick.r == paddle.r:
+        if brick.r == paddle.r-1:
             game_over = True
 
 
