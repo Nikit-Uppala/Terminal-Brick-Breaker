@@ -51,6 +51,8 @@ class Brick:
         self.health = 0
 
     def on_hit(self):
+        if hasattr(self, "hit"):
+            self.hit = True
         if self.health > 0:
             self.health -= 1
             if self.health > 0:
@@ -104,3 +106,18 @@ class NonBreakableBrick(Brick):
 
     def on_hit(self):
         pass
+
+class RainbowBrick(Brick):
+    
+    def __init__(self, r, c):
+        self.color = 0
+        self.hit = False
+        super().__init__(1+self.color, r, c, 75)
+    
+    def display_on_grid(self, grid, balls):
+        if not self.hit:
+            self.color = (self.color+1) % 3
+            self.health = 1+self.color
+            self.update_brick_structure()
+        super().display_on_grid(grid, balls)
+

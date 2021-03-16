@@ -1,12 +1,12 @@
 from board import Board
 from ball import Ball, ThroughBall
 from paddle import Paddle, GrabPaddle
-from brick import Brick
 from os import get_terminal_size
 import random as rnd
 from powerup import ExpandPaddle, ShrinkPaddle, FastBall, PowerUp
 import colorama
 from brick_pattern import generate_bricks
+from time import sleep
 
 
 def activate_power_up(power_up):
@@ -92,14 +92,12 @@ def generate_power_up(brick):
 def handle_bricks():
     global Bricks, score
     for brick in Bricks:
+        brick.display_on_grid(grid, Balls)
         if brick.health == 0:
+            score += brick.update_score()
             brick.remove_from_grid(grid)
             Bricks.remove(brick)
-            score += brick.update_score()
-            generate_power_up(brick)
             del brick
-        else:
-            brick.display_on_grid(grid, Balls)
 
 
 def activate_ball_multiplier():
@@ -245,12 +243,6 @@ while not game_over:
         else:
             reset_objects()
         continue
-    if check_game_over():
-        level += 1
-        if level > 3:
-            game_over = True
-        else:
-            reset_objects()
     if started:
         time += time_gap
 
@@ -261,6 +253,20 @@ while not game_over:
         continue
     paddle.move_paddle(grid, Balls, key)
     handle_bricks()
+    if check_game_over():
+        level += 1
+        if level > 3:
+            game_over = True
+        else:
+            reset_objects()
+            continue
     if time > time_limit and paddle.collision_ball:
         move_bricks_down()
+for brick in Bricks:
+    if brick.health >= 0:
+        brick.remove_from_grid(grid)
+        Bricks.remove(brick)
+        del brick
+key = Board.display_game_details(lives, score, level, time, time_gap)
+board.print_grid()
 print("\t\t\t\tGame Over")
