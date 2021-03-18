@@ -4,16 +4,18 @@ import colorama
 
 class Paddle:
 
-    symbol = "="
 
     def collision_with_ball(self, balls, i, grid):
         for ball in balls:
             if ball.r == self.r and ball.c == self.c + i:
                 if not ball.held:
                     self.collision_ball = True
-                    ball.collision_with_paddle(i, self.length)
+                    if not self.grab:
+                        ball.collision_with_paddle(i, self.length)
+                    else:
+                        ball.stop(i, self.length)
                 else:
-                    grid[self.r][self.c + i] = Paddle.symbol
+                    grid[self.r][self.c + i] = self.structure[i]
                     ball.move_with_paddle(grid, self.c)
 
     def display_in_grid(self, grid, balls):
@@ -22,7 +24,7 @@ class Paddle:
             if grid[self.r][self.c+i] == Ball.symbol:
                 self.collision_with_ball(balls, i, grid)
             else:
-                grid[self.r][self.c+i] = Paddle.symbol
+                grid[self.r][self.c+i] = self.structure[i]
 
     def remove_from_grid(self, grid):
         for i in range(self.length):
@@ -30,19 +32,24 @@ class Paddle:
 
     def increase_length(self, increase):
         self.length = self.length + increase
+        for i in range(increase):
+            self.structure.append("=")
 
     def decrease_length(self, decrease, grid):
         self.length = self.length - decrease
         end_col = self.c + self.length-1
         for i in range(decrease):
             grid[self.r][end_col+i+1] = " "
+            self.structure.pop()
 
     def __init__(self, length, r, c):
         self.length = length
+        self.structure = ["=" for i in range(self.length)]
         self.r = r
         self.c = c
         self.step_size = 2
         self.collision_ball = False
+        self.grab = False
 
     def get_position(self):
         return self.r, self.c
@@ -90,18 +97,11 @@ class Paddle:
                         ball.release(grid)
                         break
         self.display_in_grid(grid, balls)
+    
+    def toggle_grab_paddle(self):
+        self.grab = not self.grab
 
-
-class GrabPaddle(Paddle):
+class ShooterPaddle(Paddle):
 
     def __init__(self, length, r, c):
-        super().__init__(length, r, c)
-
-    def collision_with_ball(self, balls, i, grid):
-        for ball in balls:
-            if ball.r == self.r and ball.c == self.c + i:
-                if not ball.held:
-                    ball.stop(i, self.length)
-                else:
-                    grid[self.r][self.c + i] = Paddle.symbol
-                    ball.move_with_paddle(grid, self.c)
+        pass

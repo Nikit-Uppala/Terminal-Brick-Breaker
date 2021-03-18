@@ -1,6 +1,6 @@
 from board import Board
 from ball import Ball, ThroughBall
-from paddle import Paddle, GrabPaddle
+from paddle import Paddle
 from os import get_terminal_size
 from brick import Brick
 import random as rnd
@@ -16,7 +16,7 @@ def activate_power_up(power_up):
     power_up.set_active(True)
     if "=" in power_up.symbol:
         if colorama.Fore.GREEN in power_up.symbol:
-            paddle = GrabPaddle(paddle.length, paddle.r, paddle.c)
+            paddle.toggle_grab_paddle()
         else:
             power_up.activate(paddle, grid)
     else:
@@ -33,7 +33,7 @@ def deactivate_power_up(power_up):
     power_up.set_active(False)
     if "=" in power_up.symbol:
         if colorama.Fore.GREEN in power_up.symbol:
-            paddle = Paddle(paddle.length, paddle.r, paddle.c)
+            paddle.toggle_grab_paddle()
         else:
             power_up.deactivate(paddle, grid)
     else:
@@ -235,7 +235,7 @@ Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
 lives = 3
 score = 0
 time = 0
-catchable_power_ups = []
+catchable_power_ups = [PowerUp(6, 36, PowerUp.power_up_symbols[-1])]
 active_power_ups = []
 game_over = False
 level = 1
