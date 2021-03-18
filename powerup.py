@@ -9,7 +9,8 @@ class PowerUp:
         colorama.Fore.YELLOW+"O"+colorama.Fore.RESET,
         colorama.Fore.RED+"O"+colorama.Fore.RESET,
         colorama.Fore.GREEN+"O"+colorama.Fore.RESET,
-        colorama.Fore.GREEN+"="+colorama.Fore.RESET
+        colorama.Fore.GREEN+"="+colorama.Fore.RESET,
+        colorama.Fore.YELLOW+"^"+colorama.Fore.RESET
     )
 
     def __init__(self, r, c, symbol):

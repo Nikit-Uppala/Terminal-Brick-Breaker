@@ -1,5 +1,6 @@
 from ball import Ball
 import colorama
+from laser import Laser
 
 
 class Paddle:
@@ -42,14 +43,14 @@ class Paddle:
             grid[self.r][end_col+i+1] = " "
             self.structure.pop()
 
-    def __init__(self, length, r, c):
+    def __init__(self, length, r, c, grab=False):
         self.length = length
         self.structure = ["=" for i in range(self.length)]
         self.r = r
         self.c = c
         self.step_size = 2
         self.collision_ball = False
-        self.grab = False
+        self.grab = grab
 
     def get_position(self):
         return self.r, self.c
@@ -103,5 +104,16 @@ class Paddle:
 
 class ShooterPaddle(Paddle):
 
-    def __init__(self, length, r, c):
-        pass
+    def __init__(self, length, r, c, time, grab=False):
+        super().__init__(length, r, c, grab)
+        self.structure = []
+        self.prev = time
+        for i in range(self.length):
+            if i == 0 or i == self.length - 1:
+                self.structure.append("|")
+            else:
+                self.structure.append("=")
+    
+    def shoot_laser(self, lasers):
+        lasers.append(Laser(self.r-1, self.c))
+        lasers.append(Laser(self.r-1, self.c+self.length-1))

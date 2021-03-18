@@ -1,6 +1,6 @@
 from board import Board
 from ball import Ball, ThroughBall
-from paddle import Paddle
+from paddle import Paddle, ShooterPaddle
 from os import get_terminal_size
 from brick import Brick
 import random as rnd
@@ -14,7 +14,10 @@ from laser import Laser
 def activate_power_up(power_up):
     global paddle, grid, Balls
     power_up.set_active(True)
-    if "=" in power_up.symbol:
+    if "^" in power_up.symbol:
+        paddle.remove_from_grid(grid)
+        paddle = ShooterPaddle(paddle.length, paddle.r, paddle.c, time, paddle.grab)
+    elif "=" in power_up.symbol:
         if colorama.Fore.GREEN in power_up.symbol:
             paddle.toggle_grab_paddle()
         else:
@@ -31,7 +34,11 @@ def activate_power_up(power_up):
 def deactivate_power_up(power_up):
     global paddle, grid, Balls
     power_up.set_active(False)
-    if "=" in power_up.symbol:
+    if "^" in power_up.symbol:
+        paddle.remove_from_grid(grid)
+        paddle = ShooterPaddle(paddle.length, paddle.r,
+                               paddle.c, time, paddle.grab)
+    elif "=" in power_up.symbol:
         if colorama.Fore.GREEN in power_up.symbol:
             paddle.toggle_grab_paddle()
         else:
@@ -97,6 +104,9 @@ def generate_power_up(brick, ball_velocity):
             catchable_power_ups.append(
                 PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up]))
         elif type_power_up == 5:
+            catchable_power_ups.append(
+                PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up]))
+        elif type_power_up == 6:
             catchable_power_ups.append(
                 PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up]))
 
@@ -189,9 +199,14 @@ def check_game_over():
 
 def reset_objects():
     global Balls, paddle, catchable_power_ups, active_power_ups, Bricks, started, time_limit, level_start_time
+    global Lasers
+    for laser in Lasers:
+        laser.remove_from_grid(grid)
+        Lasers.remove(laser)
+        del laser
     for ball in Balls:
         if 0 < ball.c < resolution[1] or ball.r > 0:
-            ball.remove_from_gird(grid)
+            ball.remove_from_grid(grid)
             Balls.remove(ball)
             del ball
     paddle.remove_from_grid(grid)
@@ -223,19 +238,19 @@ def move_bricks_down():
 
 
 power_up_probability = 0.46
-num_power_ups = 6
+num_power_ups = 7
 terminal_size = get_terminal_size(0)
 resolution = (terminal_size.lines-3, terminal_size.columns-2)
 grid = []
 board = Board(resolution[0], resolution[1], grid)
 board.create_grid()
 Balls = []
-paddle = Paddle(7, resolution[0]-2, resolution[1]//2)
+paddle=Paddle(7, resolution[0] - 2, resolution[1] // 2)
 Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
 lives = 3
 score = 0
 time = 0
-catchable_power_ups = [PowerUp(6, 36, PowerUp.power_up_symbols[-1])]
+catchable_power_ups = []
 active_power_ups = []
 game_over = False
 level = 1
@@ -245,7 +260,7 @@ time_gap = 0.1
 started = False
 life_lost = False
 level_up_cheat = 'lL'
-laser_interval = 0.55
+laser_interval = 0.8
 Lasers = []
 
 while not game_over:
@@ -260,6 +275,10 @@ while not game_over:
         continue
     if started:
         time += time_gap
+    if hasattr(paddle, "prev"):
+        if time - paddle.prev >= laser_interval:
+            paddle.prev = time
+            paddle.shoot_laser(Lasers)
 
     handle_power_ups()
     handle_balls()
