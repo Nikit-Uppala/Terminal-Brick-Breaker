@@ -2,11 +2,13 @@ from board import Board
 from ball import Ball, ThroughBall
 from paddle import Paddle, GrabPaddle
 from os import get_terminal_size
+from brick import Brick
 import random as rnd
 from powerup import ExpandPaddle, ShrinkPaddle, FastBall, PowerUp
 import colorama
 from brick_pattern import generate_bricks
 from time import sleep
+from laser import Laser
 
 
 def activate_power_up(power_up):
@@ -67,7 +69,17 @@ def handle_balls():
             game_over = True
 
 
-def generate_power_up(brick):
+def handle_lasers():
+    global Lasers, grid
+    for laser in Lasers:
+        laser.update_position(grid)
+        if laser.r == 0:
+            laser.remove_from_grid(grid)
+            Lasers.remove(laser)
+            del laser
+
+
+def generate_power_up(brick, ball_velocity):
     global power_up_probability, catchable_power_ups, num_power_ups
     random_number = rnd.random()
     if random_number <= power_up_probability:
@@ -92,11 +104,12 @@ def generate_power_up(brick):
 def handle_bricks():
     global Bricks, score
     for brick in Bricks:
-        brick.display_on_grid(grid, Balls)
+        brick.display_on_grid(grid, Balls, Lasers)
         if brick.health == 0:
             score += brick.update_score()
             brick.remove_from_grid(grid)
             Bricks.remove(brick)
+            generate_power_up(brick, brick.ball_velocity)
             del brick
 
 
@@ -232,6 +245,8 @@ time_gap = 0.1
 started = False
 life_lost = False
 level_up_cheat = 'lL'
+laser_interval = 0.55
+Lasers = []
 
 while not game_over:
     key = Board.display_game_details(lives, score, level, time, time_gap)
@@ -248,6 +263,7 @@ while not game_over:
 
     handle_power_ups()
     handle_balls()
+    handle_lasers()
     if life_lost:
         life_lost = False
         continue

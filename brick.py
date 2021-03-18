@@ -1,5 +1,7 @@
 from ball import Ball
+from laser import Laser
 import colorama
+from time import sleep
 
 
 class Brick:
@@ -14,6 +16,7 @@ class Brick:
         self.c = c
         self.score = score
         self.brick_structure = []
+        self.ball_velocity = (-1, -1)
         for i in range(3):
             self.brick_structure.append([])
             for j in range(Brick.brick_length):
@@ -47,23 +50,41 @@ class Brick:
     def update_score(self):
         return self.score
 
-    def destroy(self):
+    def destroy(self, ball_velocity):
         self.health = 0
+        self.ball_velocity = ball_velocity
 
-    def on_hit(self):
+    def on_hit(self, ball_velocity):
         if hasattr(self, "hit"):
-            self.hit = True
+            if not self.hit:
+                self.hit = True
+                return
         if self.health > 0:
             self.health -= 1
             if self.health > 0:
                 self.update_brick_structure()
+            else:
+                self.ball_velocity = ball_velocity
 
-    def display_on_grid(self, grid, balls):
+    def display_on_grid(self, grid, balls, lasers):
         n_rows = len(self.brick_structure)
         start, end = -(n_rows // 2), n_rows // 2
-        for r in range(start, end + 1):
+        if grid[self.r][self.c] == Ball.symbol or grid[self.r][self.c+Brick.brick_length-1] == Ball.symbol:
+            for ball in balls:
+                position = ball.get_position()
+                velocity = ball.get_velocity()
+                if position[0] == self.r and position[1] == self.c or position[1] == self.c+Brick.brick_length:
+                    ball.collision_with_horizontal_wall()
+                    if hasattr(ball, "through"):
+                        self.destroy(velocity)
+                    else:
+                        self.on_hit(velocity)
+        else:
+            for i in range(Brick.brick_length):
+                grid[self.r][self.c+i] = self.brick_structure[1][i]
+        for r in (start, end):
             for c in range(Brick.brick_length):
-                if (r == start or r == end) and grid[self.r+r][self.c+c] == Ball.symbol:
+                if grid[self.r+r][self.c+c] == Ball.symbol:
                     for ball in balls:
                         position = ball.get_position()
                         velocity = ball.get_velocity()
@@ -78,18 +99,18 @@ class Brick:
                             else:
                                 ball.collision_with_brick_vertical()
                             if hasattr(ball, "through"):
-                                self.destroy()
+                                self.destroy(velocity)
                             else:
-                                self.on_hit()
-                elif (c == 0 or c == Brick.brick_length-1) and grid[self.r+r][self.c+c] == Ball.symbol:
-                    for ball in balls:
-                        position = ball.get_position()
-                        if position[0] == self.r+r and position[1] == self.c+c:
-                            ball.collision_with_brick_horizontal()
-                        if hasattr(ball, "through"):
-                            self.destroy()
-                        else:
-                            self.on_hit()
+                                self.on_hit(velocity)
+                elif grid[self.r+r][self.c+c] == Laser.symbol:
+                    velocity = (0, 0)
+                    for laser in lasers:
+                        if laser.r == self.r+r:
+                            velocity = laser.get_velocity()
+                            laser.remove_from_grid(grid)
+                            lasers.remove(laser)
+                            del laser
+                    self.on_hit(velocity)
                 else:
                     grid[self.r+r][self.c+c] = self.brick_structure[r+1][c]
         if self.health != 0:
@@ -104,7 +125,7 @@ class NonBreakableBrick(Brick):
     def __init__(self, r, c):
         super().__init__(-1, r, c, 100)
 
-    def on_hit(self):
+    def on_hit(self, velocity):
         pass
 
 class RainbowBrick(Brick):
@@ -114,10 +135,10 @@ class RainbowBrick(Brick):
         self.hit = False
         super().__init__(1+self.color, r, c, 75)
     
-    def display_on_grid(self, grid, balls):
+    def display_on_grid(self, grid, balls, lasers):
         if not self.hit:
             self.color = (self.color+1) % 3
             self.health = 1+self.color
             self.update_brick_structure()
-        super().display_on_grid(grid, balls)
+        super().display_on_grid(grid, balls, lasers)
 
