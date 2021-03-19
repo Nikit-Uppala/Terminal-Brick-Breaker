@@ -29,7 +29,8 @@ class Paddle:
 
     def remove_from_grid(self, grid):
         for i in range(self.length):
-            grid[self.r][self.c+i] = " "
+            if grid[self.r][self.c+i] != Ball.symbol:
+                grid[self.r][self.c+i] = " "
 
     def increase_length(self, increase):
         self.length = self.length + increase

@@ -36,8 +36,7 @@ def deactivate_power_up(power_up):
     power_up.set_active(False)
     if "^" in power_up.symbol:
         paddle.remove_from_grid(grid)
-        paddle = ShooterPaddle(paddle.length, paddle.r,
-                               paddle.c, time, paddle.grab)
+        paddle = Paddle(paddle.length, paddle.r, paddle.c, paddle.grab)
     elif "=" in power_up.symbol:
         if colorama.Fore.GREEN in power_up.symbol:
             paddle.toggle_grab_paddle()
@@ -92,23 +91,17 @@ def generate_power_up(brick, ball_velocity):
     if random_number <= power_up_probability:
         type_power_up = rnd.randint(0, num_power_ups-1)
         if type_power_up == 0:
-            catchable_power_ups.append(ExpandPaddle(brick.r, brick.c+Brick.brick_length//2))
+            catchable_power_ups.append(ExpandPaddle(brick.r, brick.c+Brick.brick_length//2, brick.ball_velocity))
         elif type_power_up == 1:
-            catchable_power_ups.append(ShrinkPaddle(brick.r, brick.c+Brick.brick_length//2))
+            catchable_power_ups.append(ShrinkPaddle(brick.r, brick.c+Brick.brick_length//2, brick.ball_velocity))
         elif type_power_up == 2:
             catchable_power_ups.append(
-                PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up]))
+                PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up], brick.ball_velocity))
         elif type_power_up == 3:
-            catchable_power_ups.append(FastBall(brick.r, brick.c+Brick.brick_length//2))
-        elif type_power_up == 4:
+            catchable_power_ups.append(FastBall(brick.r, brick.c+Brick.brick_length//2, brick.ball_velocity))
+        else:
             catchable_power_ups.append(
-                PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up]))
-        elif type_power_up == 5:
-            catchable_power_ups.append(
-                PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up]))
-        elif type_power_up == 6:
-            catchable_power_ups.append(
-                PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up]))
+                PowerUp(brick.r, brick.c+Brick.brick_length//2, PowerUp.power_up_symbols[type_power_up], brick.ball_velocity))
 
 
 def handle_bricks():

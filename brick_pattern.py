@@ -3,7 +3,7 @@ import random as rnd
 
 
 def generate_bricks(resolution, level):
-    return [RainbowBrick(6, 35)]
+    return [RainbowBrick(6, 35), NonBreakableBrick(6, 45)]
     bricks = []
     rows = resolution[0]
     cols = resolution[1]
