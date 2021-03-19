@@ -15,7 +15,7 @@ class Boss:
     colorama.Fore.YELLOW + ")" + colorama.Fore.RESET
     )
     length = len(structure)
-    bomb_interval = 1.2
+    bomb_interval = 2
     def __init__(self, r, c, health, time):
         self.r = r
         self.c = c
@@ -60,18 +60,26 @@ class Boss:
         for i in range(Boss.length):
             grid[self.r][self.c+i] = " "
 
-    def pattern_1(self, bricks, resolution):
+    def pattern_1(self, bricks):
         self.spawn_1 = True
-        bricks.append(Brick(3, 9, 4, 50))
-        bricks.append(Brick(1, 9, 12, 10))
-        bricks.append(Brick(2, 9, 20, 30))
+        bricks.append(Brick(3, 10, 4, 50))
+        bricks.append(Brick(1, 10, 18, 10))
+        bricks.append(Brick(2, 10, 29, 30))
+        bricks.append(Brick(3, 10, 40, 50))
+        bricks.append(Brick(1, 10, 62, 10))
+        bricks.append(Brick(1, 10, 70, 10))
 
-    def pattern_2(self, bricks, resolution):
+
+
+    def pattern_2(self, bricks):
         self.spawn_2 = True
-        bricks.append(Brick(3, 13, 4, 50))
-        bricks.append(Brick(1, 13, 12, 10))
-        bricks.append(Brick(2, 13, 20, 30))
+        bricks.append(Brick(2, 13, 5, 30))
+        bricks.append(Brick(1, 13, 18, 10))
+        bricks.append(Brick(2, 13, 29, 30))
+        bricks.append(Brick(3, 13, 40, 30))
+        bricks.append(Brick(2, 13, 62, 30))
+        bricks.append(Brick(2, 13, 70, 30))
     
     def generate_bomb(self, bombs):
-        bombs.append(Bomb(self.r, self.c+Boss.length//2))
+        bombs.append(Bomb(self.r+1, self.c+Boss.length//2))
 

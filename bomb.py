@@ -16,5 +16,6 @@ class Bomb:
             grid[self.r][self.c] = Bomb.symbol
     
     def remove_from_grid(self, grid):
-        if grid[self.r][self.c] != Bomb.symbol:
-            grid[self.r][self.c] = " "
+        if self.r == len(grid)-1:
+            grid[self.r][self.c] = "-"
+        grid[self.r][self.c] = " "

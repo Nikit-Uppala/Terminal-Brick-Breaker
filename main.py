@@ -13,28 +13,28 @@ from boss import Boss
 
 
 def handle_life_lost():
-    global Balls, Lasers, Bombs, started
+    global Balls, Lasers, Bombs, started, grid
     started = False
     for ball in Balls:
         grid[ball.r][ball.c] = " "
-        Balls.remove(ball)
         del ball
+    Balls.clear()
     Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
     for laser in Lasers:
         laser.remove_from_grid(grid)
-        Lasers.remove(laser)
         del laser
+    Lasers.clear()
     for bomb in Bombs:
         bomb.remove_from_grid(grid)
-        Bombs.remove(bomb)
         del bomb
+    Bombs.clear()
     for power_up in catchable_power_ups:
-        catchable_power_ups.remove(power_up)
         del power_up
+    catchable_power_ups.clear()
     for power_up in active_power_ups:
         deactivate_power_up(power_up)
-        active_power_ups.remove(power_up)
         del power_up
+    active_power_ups.clear()
 
     
 
@@ -226,27 +226,27 @@ def reset_objects():
     for ball in Balls:
         if 0 < ball.c < resolution[1] or ball.r > 0:
             ball.remove_from_grid(grid)
-            Balls.remove(ball)
             del ball
+    Balls.clear()
     paddle.remove_from_grid(grid)
     paddle = Paddle(7, resolution[0] - 2, resolution[1] // 2)
     Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
     for brick in Bricks:
         brick.remove_from_grid(grid)
-        Bricks.remove(brick)
         del brick
-    Bricks = generate_bricks(resolution, level)
+    Bricks.clear()
+    Bricks = generate_bricks(level)
     for power_up in catchable_power_ups:
         power_up.remove_from_grid(grid)
-        catchable_power_ups.remove(power_up)
         del power_up
+    catchable_power_ups.clear()
     for power_up in active_power_ups:
-        active_power_ups.remove(power_up)
         del power_up
+    active_power_ups.clear()
     for bomb in Bombs:
-        bomb.remove_from_grid()
-        Bombs.remove(bomb)
+        bomb.remove_from_grid(grid)
         del bomb
+    Bombs.clear()
     started = False
     time_limit = time + 10 * level
 
@@ -268,10 +268,6 @@ def handle_boss_level():
         boss.generate_bomb(Bombs)
     if boss.health == 0:
         game_over = True
-    elif boss.health == boss_critical_1 and not boss.spawn_1:
-        boss.pattern_1(Bricks, resolution)
-    elif boss.health == boss_critical_2 and not boss.spawn_2:
-        boss.pattern_2(Bricks, resolution)
 
 
 def handle_bombs():
@@ -295,8 +291,7 @@ def handle_bombs():
 
 power_up_probability = 0.46
 num_power_ups = 7
-terminal_size = get_terminal_size(0)
-resolution = (terminal_size.lines-3, terminal_size.columns-2)
+resolution = (28, 84)
 grid = []
 board = Board(resolution[0], resolution[1], grid)
 board.create_grid()
@@ -310,7 +305,7 @@ catchable_power_ups = []
 active_power_ups = []
 game_over = False
 level = 1
-Bricks = generate_bricks(resolution, level)
+Bricks = generate_bricks(level)
 time_limit = 0.5
 time_gap = 0.1
 started = False
@@ -366,7 +361,13 @@ while not game_over:
         continue
     if not(level == boss_level) and time > time_limit and paddle.collision_ball:
         move_bricks_down()
+    if level == boss_level and boss.health <= boss_critical_1 and not boss.spawn_1 and paddle.collision_ball:
+        boss.pattern_1(Bricks)
+    elif level == boss_level and boss.health <= boss_critical_2 and not boss.spawn_2 and paddle.collision_ball:
+        boss.pattern_2(Bricks)
 
+board.display_game_details(lives, score, level, time, time_gap, None if boss is None else boss.health)
+board.print_grid()
 if boss.health == 0:
     print("\t\t\t\tYou Won!")
 print("\t\t\t\tGame Over")

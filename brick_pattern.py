@@ -2,23 +2,31 @@ from brick import Brick, NonBreakableBrick, RainbowBrick
 import random as rnd
 
 
-def generate_bricks(resolution, level):
-    return [RainbowBrick(6, 35), NonBreakableBrick(6, 45)]
+def generate_bricks(level):
     bricks = []
-    rows = resolution[0]
-    cols = resolution[1]
-    start_row, end_row = 3, 3*level
-    start_col, end_col = 4, cols-12
-    for r in range(start_row, end_row+1, 3):
-        for c in range(start_col, end_col, Brick.brick_length+2):
-            if r == start_row or r == end_row:
-                health = rnd.randint(1, 3)
-                bricks.append(Brick(health, r, c, health*20-10))
-            else:
-                type_brick = rnd.random()
-                if type_brick > 0.5:
-                    bricks.append(NonBreakableBrick(r, c))
-                else:
-                    health = rnd.randint(1, 3)
-                    bricks.append(Brick(health, r, c, 20*health-10))
+    if level == 1:
+        bricks.append(Brick(1, 4, 16, 10))
+        bricks.append(Brick(1, 10, 16, 10))
+        bricks.append(RainbowBrick(4, 36))
+        bricks.append(Brick(2, 10, 28, 30))
+        bricks.append(NonBreakableBrick(10, 60))
+    elif level == 2:
+        bricks.append(Brick(2, 4, 20, 30))
+        bricks.append(NonBreakableBrick(4, 30))
+        bricks.append(Brick(2, 4, 55, 30))
+        bricks.append(Brick(1, 4, 65, 10))
+        bricks.append(RainbowBrick(9, 36))
+        bricks.append(Brick(3, 9, 16, 50))
+        bricks.append(NonBreakableBrick(9, 60))
+        bricks.append(Brick(1, 14, 20, 10))
+        bricks.append(Brick(1, 14, 57, 10))
+        bricks.append(RainbowBrick(14, 40))
+    elif level == 3:
+        bricks.append(NonBreakableBrick(6, 8))
+        bricks.append(NonBreakableBrick(6, 70))
+        bricks.append(NonBreakableBrick(6, 42))
+
+
+
+
     return bricks
