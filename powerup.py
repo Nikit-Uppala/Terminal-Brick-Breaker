@@ -21,6 +21,8 @@ class PowerUp:
         self.active = False
         self.v_r = velocity[0]
         self.v_c = velocity[1]
+        self.a_c = 1
+        self.frames = 0
 
     def set_active(self, state):
         self.active = state
@@ -86,6 +88,11 @@ class PowerUp:
         if grid[self.r][self.c] == self.symbol:
             grid[self.r][self.c] = " "
         self.r, self.c = new_r, new_c
+        self.frames += 1
+        if self.frames > 2:
+            self.frames = 0
+            if self.v_r < 2:
+                self.v_r += self.a_c
 
     def remove_from_grid(self, grid):
         if grid[self.r][self.c] == self.symbol:
