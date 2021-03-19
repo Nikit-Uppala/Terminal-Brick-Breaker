@@ -37,3 +37,21 @@ Power up lasts for 8 seconds
 Controls - 
 keys 'a' and 'd' for moving the paddle left and right respectively
 space bar - for releasing the ball caught on paddle
+
+Additional Instructions for Assignment 3 - 
+Levels - There are 3 levels - 2 normal and 1 boss level
+When you destroy all the breakable bricks, the level ends.
+Skipping level - press 'l'
+
+Falling Bricks - In each level after certain time, when ball touches the paddle, all the bricks starts coming down by 1 row.
+When the lowest brick is on the level of paddle then game ends.
+
+Power up 2.0 - Now the powerups dont fall vertically but they are projected with velocity of the ball which destroyed the respective brick. Gravity effect observed in every 3 frames.
+
+Rainbow Bricks - These bricks have different colors in different frames until the ball makes first contact with it. When ball hits this wall, it gets a certain color (depending on when the ball hit) and it becomes a destroyable brick.
+
+Shooting paddle - Yellow color ("^") indicates this power up. On taking this, paddle structure changes from 
+"=======" to"|=====|" where "|" indicates cannon. Red colored "^" indicates lasers which will be released from the cannons.
+
+Boss enemy - "(((=)))" is the UFO.
+It has a health of 10. When its health reaches below 7, when ball touches the paddle, bricks will spawn(1st spawn) and simimiliarly second spawn is when its health falls below 4.
