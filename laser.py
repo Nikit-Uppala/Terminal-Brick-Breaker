@@ -14,7 +14,6 @@ class Laser:
         grid[self.r][self.c] = Laser.symbol
     
     def remove_from_grid(self, grid):
-        print(self.r)
         if self.r == 0 or self.r == -1:
             grid[self.r][self.c] = "-"
         else:

@@ -9,7 +9,34 @@ import colorama
 from brick_pattern import generate_bricks
 from time import sleep
 from laser import Laser
+from boss import Boss
 
+
+def handle_life_lost():
+    global Balls, Lasers, Bombs, started
+    started = False
+    for ball in Balls:
+        grid[ball.r][ball.c] = " "
+        Balls.remove(ball)
+        del ball
+    Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
+    for laser in Lasers:
+        laser.remove_from_grid(grid)
+        Lasers.remove(laser)
+        del laser
+    for bomb in Bombs:
+        bomb.remove_from_grid(grid)
+        Bombs.remove(bomb)
+        del bomb
+    for power_up in catchable_power_ups:
+        catchable_power_ups.remove(power_up)
+        del power_up
+    for power_up in active_power_ups:
+        deactivate_power_up(power_up)
+        active_power_ups.remove(power_up)
+        del power_up
+
+    
 
 def activate_power_up(power_up):
     global paddle, grid, Balls
@@ -66,11 +93,7 @@ def handle_balls():
         lives -= 1
         if lives > 0:
             life_lost = True
-            Balls.append(Ball(paddle.r, paddle.c, 0, 0, grid, paddle.length, True))
-            for power_up in active_power_ups:
-                deactivate_power_up(power_up)
-                active_power_ups.remove(power_up)
-                del power_up
+            handle_life_lost()
         else:
             game_over = True
 
@@ -112,7 +135,8 @@ def handle_bricks():
             score += brick.update_score()
             brick.remove_from_grid(grid)
             Bricks.remove(brick)
-            generate_power_up(brick, brick.ball_velocity)
+            if level != boss_level:
+                generate_power_up(brick, brick.ball_velocity)
             del brick
 
 
@@ -182,8 +206,10 @@ def handle_power_ups():
             del power_up
 
 
-def check_game_over():
-    global Bricks, level, lives
+def check_level_over():
+    global Bricks, level, lives, boss_level
+    if level == boss_level:
+        return False
     for brick in Bricks:
         if brick.health > 0:
             return False
@@ -217,17 +243,54 @@ def reset_objects():
     for power_up in active_power_ups:
         active_power_ups.remove(power_up)
         del power_up
+    for bomb in Bombs:
+        bomb.remove_from_grid()
+        Bombs.remove(bomb)
+        del bomb
     started = False
     time_limit = time + 10 * level
 
 
 def move_bricks_down():
     global Bricks, game_over
-    for brick in Bricks:
-        brick.remove_from_grid(grid)
-        brick.move_down()
-        if brick.r == paddle.r-1:
-            game_over = True
+    if level != boss_level:
+        for brick in Bricks:
+            brick.remove_from_grid(grid)
+            brick.move_down()
+            if brick.r == paddle.r-1:
+                game_over = True
+
+def handle_boss_level():
+    global grid, boss, paddle, Balls, Lasers, time, game_over, boss_critical_1, boss_critical_2
+    boss.move_with_paddle(grid, paddle, Balls, Lasers)
+    if time - boss.prev >= Boss.bomb_interval:
+        boss.prev = time
+        boss.generate_bomb(Bombs)
+    if boss.health == 0:
+        game_over = True
+    elif boss.health == boss_critical_1 and not boss.spawn_1:
+        boss.pattern_1(Bricks, resolution)
+    elif boss.health == boss_critical_2 and not boss.spawn_2:
+        boss.pattern_2(Bricks, resolution)
+
+
+def handle_bombs():
+    global Bombs, grid, paddle, life_lost, lives, Balls, Lasers, game_over
+    for bomb in Bombs:
+        bomb.update_position(grid, paddle)
+        if bomb.r >= len(grid)-1:
+            Bombs.remove(bomb)
+            del bomb
+        elif bomb.r == paddle.r and paddle.c <= bomb.c < paddle.c+paddle.length:
+            lives -= 1
+            life_lost = True
+            print("life lost")
+            if lives > 0:
+                handle_life_lost()
+            else:
+                game_over = True
+            break
+
 
 
 power_up_probability = 0.46
@@ -254,14 +317,23 @@ started = False
 life_lost = False
 level_up_cheat = 'lL'
 laser_interval = 0.8
+boss_level = 3
+boss_critical_1 = 5
+boss_critical_2 = 3
+boss = None
+boss_health = 10
+boss_row = 3
 Lasers = []
+Bombs = []
 
 while not game_over:
-    key = Board.display_game_details(lives, score, level, time, time_gap)
+    key = Board.display_game_details(lives, score, level, time, time_gap, None if boss is None else boss.health)
     board.print_grid()
     if key is not None and key in level_up_cheat:
         level += 1
-        if level > 3:
+        if level == boss_level:
+            boss = Boss(boss_row, paddle.c, boss_health, time)
+        if level > boss_level:
             game_over = True
         else:
             reset_objects()
@@ -276,25 +348,25 @@ while not game_over:
     handle_power_ups()
     handle_balls()
     handle_lasers()
+    handle_bombs()
     if life_lost:
         life_lost = False
         continue
     paddle.move_paddle(grid, Balls, key)
+    if level == boss_level:
+        handle_boss_level()
     handle_bricks()
-    if check_game_over():
+    if check_level_over():
         level += 1
-        if level > 3:
+        if level == boss_level and boss is None:
+            boss = Boss(boss_row, paddle.c, boss_health, time)
+        if level > boss_level:
             game_over = True
-        else:
-            reset_objects()
-            continue
-    if time > time_limit and paddle.collision_ball:
+        reset_objects()
+        continue
+    if not(level == boss_level) and time > time_limit and paddle.collision_ball:
         move_bricks_down()
-for brick in Bricks:
-    if brick.health >= 0:
-        brick.remove_from_grid(grid)
-        Bricks.remove(brick)
-        del brick
-key = Board.display_game_details(lives, score, level, time, time_gap)
-board.print_grid()
+
+if boss.health == 0:
+    print("\t\t\t\tYou Won!")
 print("\t\t\t\tGame Over")

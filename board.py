@@ -30,7 +30,7 @@ class Board:
             print()
 
     @staticmethod
-    def display_game_details(lives, score, level, time, sleep_time):
+    def display_game_details(lives, score, level, time, sleep_time, boss_health=None):
         get_key = Get()
         direction = input_to(get_key, sleep_time)
         if direction is not None:
@@ -39,5 +39,9 @@ class Board:
             os.system("clear")
         else:
             os.system("cls")
-        print("Lives: %1d \tLevel:%1d \tTime: %.1f seconds \tScore: %4d" % (lives, level, time, score))
+        print("Lives: %1d  Level:%1d  Time: %.1f seconds  Score: %4d  " % (lives, level, time, score), end="")
+        if boss_health is not None:
+            print("Boss Health: %2d"% boss_health)
+        else:
+            print()
         return direction
