@@ -1,4 +1,4 @@
-#Brick Breaker
+# Brick Breaker
 
 In this game, the user needs to destroy all the breakable bricks with the help of ball and paddle.
 The user would be given 3 lives. A life is lost when ball touches the bottom wall.
