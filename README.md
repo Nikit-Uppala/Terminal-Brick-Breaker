@@ -1,5 +1,7 @@
 # Brick Breaker
 
+To run the game - open a terminal and run "python main.py" command. (use python3 instead of python in linux).
+
 In this game, the user needs to destroy all the breakable bricks with the help of ball and paddle.
 The user would be given 3 lives. A life is lost when ball touches the bottom wall.
 There are 4 types of bricks - 3 Breakable and the last one is unbreakable.
